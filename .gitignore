@@ -1,0 +1,34 @@
+# IDEs and editors
+.idea
+*.iml
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - emacs
+*~
+\#*\#
+.\#*
+
+# IDE - VSCode
+.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+__debug_bin
+debug.test
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Customization
+
+# Cache
+vendor
+.persist

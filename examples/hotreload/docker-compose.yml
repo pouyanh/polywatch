@@ -1,0 +1,53 @@
+version: "3"
+services:
+  api:
+    restart: on-failure
+    build:
+      context: context/go
+    image: registry.ronaksoft.com/library/golang:dev
+    entrypoint:
+      - go
+    command:
+      - run
+      - /go/src/github.com/pouyanh/polywatch/cmd/polywatch/main.go
+    healthcheck:
+      test:
+        - "CMD"
+        - "curl"
+        - "-f"
+        - "http://localhost/health"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      default:
+        aliases:
+          - api.hotreload.plw
+    security_opt:
+      - "seccomp=unconfined"
+      - "apparmor=unconfined"
+    cap_add:
+      - SYS_PTRACE
+    working_dir: /go/src/github.com/pouyanh/polywatch/examples/hotreload/api
+    volumes:
+      - gosrc:/go/src
+      # - gomod:/go/pkg/mod
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      HOSTNAME: api.hotreload.plw
+
+      GO111MODULE: off
+      GOPRIVATE: github.com/pouyanh*,github.com/janstoon*
+
+volumes:
+  gosrc:
+    driver: lebokus/bindfs:latest
+    driver_opts:
+      sourcePath: $GOPATH/src
+      map: "1000/0:@1000/@0"
+
+  gomod:
+    driver: lebokus/bindfs:latest
+    driver_opts:
+      sourcePath: $GOPATH/pkg/mod
+      map: "1000/0:@1000/@0"
