@@ -1,0 +1,23 @@
+watchers:
+  - name: "hot reload"
+    watch:
+      method: polling
+      files:
+        - path: .
+          recursive: true
+      filters:
+        - list:
+            - \.go$
+        - on: operation
+          include: false
+          type: list
+          list:
+            - chmod
+    rateLimit:
+      strategy: debounce
+      wait: 100ms
+    kill:
+      signal: TERM
+      timeout: 3s
+    cmd: >
+      dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api

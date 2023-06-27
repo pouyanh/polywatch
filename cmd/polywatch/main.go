@@ -10,9 +10,15 @@ import (
 
 	"github.com/radovskyb/watcher"
 	"github.com/zmwangx/debounce"
+
+	"github.com/pouyanh/polywatch/config"
+	_ "github.com/pouyanh/polywatch/config/viper"
 )
 
 func main() {
+	cfg := config.MustLoad()
+	_ = cfg
+
 	w := watcher.New()
 	w.AddFilterHook(watcher.RegexFilterHook(regexp.MustCompile(`\.go$`), false))
 
