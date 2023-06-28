@@ -23,5 +23,4 @@ watchers:
     kill:
       signal: TERM
       timeout: 3s
-    cmd: >
-      dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api
+    cmd: dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api

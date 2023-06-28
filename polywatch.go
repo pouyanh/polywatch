@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 
 	"github.com/radovskyb/watcher"
@@ -49,8 +50,9 @@ func Start() error {
 type polyWatcher struct {
 	cfg config.Watcher
 
-	w  *watcher.Watcher
-	lg *log.Logger
+	w   *watcher.Watcher
+	lg  *log.Logger
+	cmd *exec.Cmd
 }
 
 func newPolyWatcher(cfg config.Watcher) (*polyWatcher, error) {
@@ -90,12 +92,25 @@ func newPolyWatcher(cfg config.Watcher) (*polyWatcher, error) {
 		}
 	}
 
-	return &polyWatcher{
+	pw := &polyWatcher{
 		cfg: cfg,
 
 		w:  w,
 		lg: lg,
-	}, nil
+	}
+
+	pw.renewCommand()
+
+	return pw, nil
+}
+
+func (pw *polyWatcher) renewCommand() {
+	argv := strings.Split(pw.cfg.Command, " ")
+	cmd := exec.Command(argv[0], argv[1:]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	pw.cmd = cmd
 }
 
 func (pw *polyWatcher) watch(ctx context.Context) error {
@@ -112,7 +127,10 @@ func (pw *polyWatcher) watch(ctx context.Context) error {
 			select {
 			case e := <-pw.w.Event:
 				pw.lg.Printf("event received: %+v\n", e)
-				_ = uh(ctx, e)
+				err := uh(ctx, e)
+				if err != nil {
+					pw.lg.Printf("error occurred during handling update: %s\n", err)
+				}
 			case err := <-pw.w.Error:
 				chErr <- err
 			case <-pw.w.Closed:
@@ -133,6 +151,7 @@ func (pw *polyWatcher) watch(ctx context.Context) error {
 	}()
 
 	defer pw.w.Close()
+	defer func() { _ = pw.kill(ctx) }()
 	select {
 	case err := <-chErr:
 		pw.lg.Printf("error occurred during watch: %s", err)
@@ -185,27 +204,31 @@ func (pw *polyWatcher) handleUpdate(uu ...update) error {
 func (pw *polyWatcher) _handleUpdate(ctx context.Context, event watcher.Event) error {
 	pw.lg.Println("updating...")
 
-	cmd := exec.Command(
-		"dlv",
-		"debug",
-		"--headless",
-		"-l",
-		":2345",
-		"--api-version=2",
-		"--accept-multiclient",
-		"--log",
-		"--continue",
-		"./cmd/api",
-	)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
+	err := pw.kill(ctx)
 	if err != nil {
-		log.Println(err)
-
-		return err
+		pw.lg.Printf("unable to kill previous command: %s", err)
 	}
 
-	return nil
+	return pw.cmd.Start()
+}
+
+func (pw *polyWatcher) kill(ctx context.Context) error {
+	if pw.cmd.Process == nil {
+		return nil
+	}
+
+	if pw.cmd.Process.Pid < 1 {
+		return nil
+	}
+
+	pw.lg.Printf("killing previous command pid(%d) with sig(%s)", pw.cmd.Process.Pid, pw.cfg.Kill.Signal)
+
+	err := pw.cmd.Process.Signal(pw.cfg.Kill.Signal)
+	if err != nil {
+		pw.lg.Printf("unable to send signal to previous command: %s", err)
+	}
+
+	defer pw.renewCommand()
+
+	return pw.cmd.Wait()
 }
