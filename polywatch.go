@@ -105,6 +105,8 @@ func newPolyWatcher(cfg config.Watcher) (*polyWatcher, error) {
 }
 
 func (pw *polyWatcher) renewCommand() {
+	// todo: support multiline command
+
 	argv := strings.Split(pw.cfg.Command, " ")
 	cmd := exec.Command(argv[0], argv[1:]...)
 	cmd.Stdout = os.Stdout
@@ -222,6 +224,8 @@ func (pw *polyWatcher) kill(ctx context.Context) error {
 	}
 
 	pw.lg.Printf("killing previous command pid(%d) with sig(%s)", pw.cmd.Process.Pid, pw.cfg.Kill.Signal)
+
+	// todo: apply kill timeout
 
 	err := pw.cmd.Process.Signal(pw.cfg.Kill.Signal)
 	if err != nil {
