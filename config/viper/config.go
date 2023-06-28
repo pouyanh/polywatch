@@ -76,14 +76,16 @@ func (w Watcher) decode() config.Watcher {
 }
 
 type Watch struct {
-	Method  config.WatchMethod `mapstructure:"method"`
-	Files   []WatchFile        `mapstructure:"files"`
-	Filters []WatchFilter      `mapstructure:"filters"`
+	Method   config.WatchMethod `mapstructure:"method"`
+	Interval *time.Duration     `mapstructure:"interval"`
+	Files    []WatchFile        `mapstructure:"files"`
+	Filters  []WatchFilter      `mapstructure:"filters"`
 }
 
 func (w Watch) decode() config.Watch {
 	dst := config.DefaultWatch
 	dst.Method = config.WatchMethod(override(string(w.Method), string(dst.Method), testStringZero))
+	dst.Interval = *override(w.Interval, &dst.Interval, testNil[time.Duration])
 	for _, f := range w.Files {
 		dst.Files = append(dst.Files, f.decode())
 	}

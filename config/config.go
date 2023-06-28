@@ -13,7 +13,8 @@ var (
 )
 
 const (
-	DefaultWatchMethod = WatchMethodPolling
+	DefaultWatchMethod   = WatchMethodPolling
+	DefaultWatchInterval = 100 * time.Millisecond
 
 	DefaultWatchFileRecursive bool = true
 
@@ -38,9 +39,10 @@ var (
 	}
 
 	DefaultWatch = Watch{
-		Method:  DefaultWatchMethod,
-		Files:   nil,
-		Filters: nil,
+		Method:   DefaultWatchMethod,
+		Interval: DefaultWatchInterval,
+		Files:    nil,
+		Filters:  nil,
 	}
 
 	DefaultWatchFile = WatchFile{
@@ -79,9 +81,10 @@ type Watcher struct {
 }
 
 type Watch struct {
-	Method  WatchMethod   `json:"method"`
-	Files   []WatchFile   `json:"files"`
-	Filters []WatchFilter `json:"filters"`
+	Method   WatchMethod   `json:"method"`
+	Interval time.Duration `json:"interval"`
+	Files    []WatchFile   `json:"files"`
+	Filters  []WatchFilter `json:"filters"`
 }
 
 type WatchMethod string

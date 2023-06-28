@@ -2,6 +2,7 @@ watchers:
   - name: "hot reload"
     watch:
       method: polling
+      interval: 100ms
       files:
         - path: .
           recursive: true
