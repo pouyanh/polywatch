@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -24,19 +26,21 @@ func main() {
 }
 
 type RspHealthCheck struct {
-	Status bool `json:"status"`
+	Pid    string `json:"pid"`
+	Status bool   `json:"status"`
 }
 
 func handleHealthCheck(rw http.ResponseWriter, _ *http.Request) {
-	writeJson(rw, RspHealthCheck{Status: true})
+	writeJson(rw, RspHealthCheck{Pid: pid(), Status: true})
 }
 
 type RspNow struct {
+	Pid  string `json:"pid"`
 	When string `json:"when"`
 }
 
 func handleNow(rw http.ResponseWriter, _ *http.Request) {
-	writeJson(rw, RspNow{When: time.Now().Format(time.RFC1123)})
+	writeJson(rw, RspNow{Pid: pid(), When: time.Now().Format(time.RFC1123)})
 }
 
 func writeJson(rw http.ResponseWriter, rsp any) {
@@ -49,4 +53,8 @@ func writeJson(rw http.ResponseWriter, rsp any) {
 	}
 
 	_, _ = rw.Write(bb)
+}
+
+func pid() string {
+	return strconv.Itoa(os.Getpid())
 }

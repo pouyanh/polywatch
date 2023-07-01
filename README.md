@@ -1,6 +1,9 @@
 # PolyWatch
 File change watcher which gets triggerred by events like file addition, contents update, ownership change or removal and
-run commands subsequently. It was designed
+run commands subsequently.
+It is designed to help in setting up a development environment for some golang services which are all run using live code.
+By using PolyWatch source code can get recompiled & started automatically on each service code file changes.
+See [hotreload](examples/hotreload) for a working example.
 
 # Contents
 * [Features](#features)
@@ -23,6 +26,7 @@ run commands subsequently. It was designed
 
 # Installation
 ## Go
+If you're a Gopher and want to install PolyWatch locally in your GOPATH:
 
 ```shell
 go install -v github.com/pouyanh/polywatch/cmd/polywatch@latest
@@ -39,7 +43,7 @@ yay -S polywatch
 Create the config file, run `polywatch` & it runs the command(s) when changes happen
 
 # Configuration
-Configuration is done using a single file named `.pw`. Extension can be `json`, `toml`, `yml`, `yaml`, `hcl` & `ini`.
+Configuration is done using a single file named `.pw` with these extensions: `json`, `toml`, `yml`, `yaml`, `hcl` & `ini`.
 It have to be located in **current working directory**.
 [Example](pw.example.yml) yaml config file can be a proper starting point.
 
