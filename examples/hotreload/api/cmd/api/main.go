@@ -18,7 +18,7 @@ func main() {
 		Handler: mux,
 	}
 
-	println("starting api server")
+	fmt.Printf("starting api server. pid: %s\n", pid())
 
 	if err := srv.ListenAndServe(); err != nil {
 		panic(err)
