@@ -15,7 +15,6 @@ run commands subsequently. It was designed
 
 # Features
 * Configurable using a single config file; Supports JSON, TOML, YAML, HCL, INI files
-[//]: # (* Choose watch method between _polling_ & _fsnotify_)
 * Watch multiple directories recursively or non-recursively
 * Concurrent watchers which run independently having their own settings & command
 * Inclusive & Exclusive file group **filters** using _regular expressions_ or list
