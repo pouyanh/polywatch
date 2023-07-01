@@ -6,5 +6,7 @@ import (
 )
 
 func main() {
-	polywatch.Start()
+	if err := polywatch.Start(); err != nil {
+		panic(err)
+	}
 }
