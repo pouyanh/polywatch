@@ -49,6 +49,7 @@ It have to be located in **current working directory**.
 2. Support multiline commands
 3. Support event filters like filters on operation scope
 4. Consider kill timeout
+5. Add wildcard filter type
 
 # Related projects
 * [fswatch][fswatch]: Command line tool to watch file changes using fsnotify
