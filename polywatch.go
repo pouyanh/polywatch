@@ -107,8 +107,10 @@ func newPolyWatcher(cfg config.Watcher) (*polyWatcher, error) {
 func (pw *polyWatcher) renewCommand() {
 	// todo: support multiline command
 
-	argv := strings.Split(pw.cfg.Command, " ")
-	cmd := exec.Command(argv[0], argv[1:]...)
+	spindx := strings.Index(pw.cfg.Command, " ")
+	c := pw.cfg.Command[:spindx]
+	args := pw.cfg.Command[spindx+1:]
+	cmd := exec.Command(c, args)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
