@@ -35,7 +35,14 @@ var (
 		Watch:     DefaultWatch,
 		RateLimit: DefaultRateLimit,
 		Kill:      DefaultKill,
-		Command:   "",
+		Command:   DefaultCommand,
+	}
+
+	DefaultCommand = Command{
+		Shell: "/bin/sh -c",
+		Path:  ".",
+		Env:   os.Environ(),
+		Exec:  "",
 	}
 
 	DefaultWatch = Watch{
@@ -77,7 +84,14 @@ type Watcher struct {
 	Watch     Watch     `json:"watch"`
 	RateLimit RateLimit `json:"rateLimit"`
 	Kill      Kill      `json:"kill"`
-	Command   string    `json:"cmd"`
+	Command   Command   `json:"cmd"`
+}
+
+type Command struct {
+	Shell string   `json:"shell"`
+	Exec  string   `json:"exec"`
+	Path  string   `json:"path"`
+	Env   []string `json:"env"`
 }
 
 type Watch struct {

@@ -61,7 +61,7 @@ type Watcher struct {
 	Watch     Watch     `mapstructure:"watch"`
 	RateLimit RateLimit `mapstructure:"rateLimit"`
 	Kill      Kill      `mapstructure:"kill"`
-	Command   string    `mapstructure:"cmd"`
+	Command   Command   `mapstructure:"cmd"`
 }
 
 func (w Watcher) decode() config.Watcher {
@@ -70,7 +70,7 @@ func (w Watcher) decode() config.Watcher {
 	dst.Watch = w.Watch.decode()
 	dst.RateLimit = w.RateLimit.decode()
 	dst.Kill = w.Kill.decode()
-	dst.Command = override(w.Command, dst.Command, testStringZero)
+	dst.Command = w.Command.decode()
 
 	return dst
 }
@@ -152,6 +152,23 @@ func (k Kill) decode() config.Kill {
 	return dst
 }
 
+type Command struct {
+	Shell   string   `mapstructure:"shell"`
+	Env     []string `mapstructure:"env"`
+	Exec string   `mapstructure:"exec"`
+	Path   string   `mapstructure:"path"`
+}
+
+func (c Command) decode() config.Command {
+	dst := config.DefaultCommand
+	dst.Shell = override(c.Shell, dst.Shell, testStringZero)
+	dst.Env = append(dst.Env, c.Env...)
+	dst.Exec = override(c.Exec, dst.Exec, testStringZero)
+	dst.Path = override(c.Path, dst.Path, testStringZero)
+
+	return dst
+}
+
 func override[T any](v, def T, testZero func(v T) bool) T {
 	if testZero(v) {
 		return def
@@ -162,6 +179,10 @@ func override[T any](v, def T, testZero func(v T) bool) T {
 
 func testStringZero(v string) bool {
 	return len(strings.TrimSpace(v)) == 0
+}
+
+func testStringSliceZero(v []string) bool {
+	return v == nil || len(v) == 0
 }
 
 func testNil[T any](v *T) bool {
