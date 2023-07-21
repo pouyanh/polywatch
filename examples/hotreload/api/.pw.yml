@@ -21,7 +21,6 @@ watchers:
       timeout: 3s
     cmd: 
       shell: /bin/sh -c
-      exec: dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api
-      env: 
-        - GO111MODULE=off
-
+      exec: go mod tidy; dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api
+      env:
+        - LOG_LEVEL=DEBUG
