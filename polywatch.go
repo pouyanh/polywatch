@@ -7,8 +7,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/radovskyb/watcher"
 	"github.com/zmwangx/debounce"
@@ -41,6 +43,15 @@ func Start() error {
 			}
 		}()
 	}
+
+	cchan := make(chan os.Signal)
+	signal.Notify(cchan, syscall.SIGTERM, syscall.SIGINT)
+
+	go func() {
+		<-cchan
+
+		stop()
+	}()
 
 	wg.Wait()
 
