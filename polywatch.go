@@ -123,6 +123,7 @@ func (pw *polyWatcher) renewCommand() {
 
 	cmd := exec.Command(rawcmd[0], rawcmd[1:]...)
 	cmd.Env = pw.cfg.Command.Env
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -240,13 +241,20 @@ func (pw *polyWatcher) kill(ctx context.Context) error {
 	pw.lg.Printf("killing previous command pid(%d) with sig(%s)", pw.cmd.Process.Pid, pw.cfg.Kill.Signal)
 
 	// todo: apply kill timeout
-
-	err := pw.cmd.Process.Signal(pw.cfg.Kill.Signal)
-	if err != nil {
-		pw.lg.Printf("unable to send signal to previous command: %s", err)
+	group, err := os.FindProcess(-1 * pw.cmd.Process.Pid)
+	if err == nil {
+		err = group.Signal(pw.cfg.Kill.Signal)
+		if err != nil {
+			pw.lg.Printf("unable to send signal to previous command: %s", err)
+		}
 	}
 
 	defer pw.renewCommand()
 
-	return pw.cmd.Wait()
+	err = pw.cmd.Wait()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
