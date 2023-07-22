@@ -8,7 +8,7 @@ services:
     entrypoint:
       - /bin/sh
     command: >
-      -c "(cd /go/src/github.com/saman3d/polywatch/cmd/polywatch; go mod tidy; go build -o /bin/polywatch); /bin/polywatch"
+      -c "(cd /go/src/github.com/pouyanh/polywatch/cmd/polywatch; go mod tidy; go build -o /bin/polywatch); /bin/polywatch"
     healthcheck:
       test:
         - "CMD"
@@ -27,7 +27,7 @@ services:
       - "apparmor=unconfined"
     cap_add:
       - SYS_PTRACE
-    working_dir: /go/src/github.com/saman3d/polywatch/examples/hotreload/api
+    working_dir: /go/src/github.com/pouyanh/polywatch/examples/hotreload/api
     volumes:
       - gosrc:/go/src
       - gomod:/go/pkg/mod
