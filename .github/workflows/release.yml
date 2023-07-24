@@ -1,0 +1,23 @@
+name: Release CLI
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  releases-matrix:
+    name: Release Executable Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: wangyoucao577/go-release-action@v1.38
+        with:
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "1.20"
+          project_path: "./cmd/polywatch"
+          binary_name: polywatch
