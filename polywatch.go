@@ -7,8 +7,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/radovskyb/watcher"
 	"github.com/zmwangx/debounce"
@@ -42,9 +44,21 @@ func Start() error {
 		}()
 	}
 
+	bindSignals(stop, syscall.SIGTERM, syscall.SIGINT)
+
 	wg.Wait()
 
 	return nil
+}
+
+func bindSignals(fn func(), ss ...os.Signal) {
+	ntfy := make(chan os.Signal, 1)
+	signal.Notify(ntfy, ss...)
+
+	go func() {
+		<-ntfy
+		fn()
+	}()
 }
 
 type polyWatcher struct {
@@ -112,6 +126,7 @@ func (pw *polyWatcher) renewCommand() {
 
 	cmd := exec.Command(rawcmd[0], rawcmd[1:]...)
 	cmd.Env = pw.cfg.Command.Env
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -229,13 +244,29 @@ func (pw *polyWatcher) kill(ctx context.Context) error {
 	pw.lg.Printf("killing previous command pid(%d) with sig(%s)", pw.cmd.Process.Pid, pw.cfg.Kill.Signal)
 
 	// todo: apply kill timeout
-
-	err := pw.cmd.Process.Signal(pw.cfg.Kill.Signal)
-	if err != nil {
-		pw.lg.Printf("unable to send signal to previous command: %s", err)
+	group, err := os.FindProcess(-1 * pw.cmd.Process.Pid)
+	if err == nil {
+		err = group.Signal(pw.cfg.Kill.Signal)
+		if err != nil {
+			pw.lg.Printf("unable to send signal to previous command: %s", err)
+		}
 	}
 
 	defer pw.renewCommand()
 
-	return pw.cmd.Wait()
+	return handleWaitError(pw.cmd.Wait(), pw.cfg.Kill.Signal)
+}
+
+func handleWaitError(err error, sig os.Signal) error {
+	if e, ok := err.(*exec.ExitError); ok {
+		status := e.ProcessState.Sys().(syscall.WaitStatus)
+		if status.Signaled() {
+			// TODO: seperate windows and posix functionality and compare relevant types
+			if status.Signal().String() == sig.String() {
+				return nil
+			}
+		}
+	}
+
+	return err
 }
