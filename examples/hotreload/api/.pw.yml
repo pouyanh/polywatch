@@ -19,9 +19,9 @@ watchers:
     kill:
       signal: TERM
       timeout: 3s
-    cmd: 
+    cmd:
       shell: /bin/sh -c
       exec: >
-        go mod tidy; dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue ./cmd/api
+        go mod tidy; dlv debug --headless -l :2345 --api-version=2 --accept-multiclient --log --continue --output __debug_bin ./cmd/api
       env:
         - LOG_LEVEL=DEBUG
