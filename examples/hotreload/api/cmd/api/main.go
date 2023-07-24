@@ -2,10 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -18,11 +22,47 @@ func main() {
 		Handler: mux,
 	}
 
-	fmt.Printf("starting api server. pid: %s\n", pid())
+	go func() {
+		for {
+			if catchSignals(os.Interrupt, syscall.SIGTERM) {
+				log.Println("shutting down...")
+				<-time.After(2 * time.Second)
+				if err := srv.Close(); err != nil {
+					log.Printf("server close error: %s\n", err)
+				}
+
+				return
+			}
+		}
+	}()
+
+	log.Printf("starting api server. pid: %s\n", pid())
 
 	if err := srv.ListenAndServe(); err != nil {
-		panic(err)
+		switch {
+		case errors.Is(http.ErrServerClosed, err):
+			log.Println("gracefully shutdown")
+
+		default:
+			panic(err)
+		}
 	}
+}
+
+func catchSignals(ss ...os.Signal) bool {
+	ntfy := make(chan os.Signal, 1)
+	signal.Notify(ntfy, ss...)
+
+	sig, ok := <-ntfy
+	if !ok {
+		log.Printf("signal channel unreadable")
+
+		return false
+	}
+
+	log.Printf("got signal: %s\n", sig)
+
+	return true
 }
 
 type RspHealthCheck struct {
