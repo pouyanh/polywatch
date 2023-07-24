@@ -7,8 +7,9 @@ services:
     image: registry.ronaksoft.com/library/golang:dev
     entrypoint:
       - /bin/sh
-    command: >
-      -c "(cd /go/src/github.com/pouyanh/polywatch/cmd/polywatch; go mod tidy; go build -o /bin/polywatch); /bin/polywatch"
+      - -c
+    command:
+      - (cd /go/src/github.com/pouyanh/polywatch/cmd/polywatch; go mod tidy; go build -o /bin/polywatch); /bin/polywatch
     healthcheck:
       test:
         - "CMD"
