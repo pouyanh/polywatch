@@ -254,10 +254,19 @@ func (pw *polyWatcher) kill(ctx context.Context) error {
 
 	defer pw.renewCommand()
 
-	err = pw.cmd.Wait()
-	if err != nil {
-		return err
+	return handleWaitError(pw.cmd.Wait(), pw.cfg.Kill.Signal)
+}
+
+func handleWaitError(err error, sig os.Signal) error {
+	if e, ok := err.(*exec.ExitError); ok {
+		status := e.ProcessState.Sys().(syscall.WaitStatus)
+		if status.Signaled() {
+			// TODO: seperate windows and posix functionality and compare relevant types
+			if status.Signal().String() == sig.String() {
+				return nil
+			}
+		}
 	}
 
-	return nil
+	return err
 }
