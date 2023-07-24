@@ -44,18 +44,21 @@ func Start() error {
 		}()
 	}
 
-	cchan := make(chan os.Signal)
-	signal.Notify(cchan, syscall.SIGTERM, syscall.SIGINT)
-
-	go func() {
-		<-cchan
-
-		stop()
-	}()
+	bindSignals(stop, syscall.SIGTERM, syscall.SIGINT)
 
 	wg.Wait()
 
 	return nil
+}
+
+func bindSignals(fn func(), ss ...os.Signal) {
+	ntfy := make(chan os.Signal, 1)
+	signal.Notify(ntfy, ss...)
+
+	go func() {
+		<-ntfy
+		fn()
+	}()
 }
 
 type polyWatcher struct {
