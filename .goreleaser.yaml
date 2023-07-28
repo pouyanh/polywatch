@@ -13,5 +13,6 @@ builds:
 
 archives:
   - format: binary
-
-
+    files:
+      - LICENSE
+      - pw.example.yml
