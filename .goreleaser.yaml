@@ -1,0 +1,14 @@
+project_name: polywatch
+builds:
+  - id: polywatch
+    main: ./cmd/polywatch
+    goos:
+      - linux
+    goarch:
+      - amd64
+    binary: polywatch
+
+archives:
+  - format: binary
+
+

@@ -32,3 +32,5 @@ Thumbs.db
 # Cache
 vendor
 .persist
+
+dist/
