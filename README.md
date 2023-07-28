@@ -51,9 +51,9 @@ It have to be located in **current working directory**.
 Configuration consists of multiple independent watchers:
 ```yaml
 watchers:
-	- name: "watcher 1"
-	- name: "watcher 2"
-	- name: "watcher 3"
+  - name: "watcher 1"
+  - name: "watcher 2"
+  - name: "watcher 3"
 ```
 
 Each watcher have 5 configuration sections:
