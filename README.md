@@ -34,7 +34,7 @@ go install -v github.com/pouyanh/polywatch/cmd/polywatch@latest
 ```
 
 ## AUR (Arch User Repository)
-If you're using [Arch Linux][archlinux] install [PolyWatch][aur-polywatch] package from [AUR][wiki-aur]
+If you're using [Arch Linux][archlinux] install [polywatch][aur-polywatch] or [polywatch-git][aur-polywatch-git] package from [AUR][wiki-aur]
 
 ```shell
 yay -S polywatch
@@ -99,6 +99,7 @@ This software is [licensed](LICENSE) under the [GPL v3 License][gpl]. © 2023 [J
 
 [archlinux]: https://www.archlinux.org/
 [aur-polywatch]: https://aur.archlinux.org/packages/polywatch
+[aur-polywatch-git]: https://aur.archlinux.org/packages/polywatch-git
 [wiki-aur]: https://wiki.archlinux.org/index.php/AUR
 [fswatch]: https://github.com/codeskyblue/fswatch
 [watcher]: https://github.com/radovskyb/watcher
