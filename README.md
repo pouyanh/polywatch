@@ -12,6 +12,7 @@ See [hotreload](examples/hotreload) for a working example.
 	* [AUR (Arch User Repository)](#aur-arch-user-repository)
 * [Usage](#usage)
 * [Configuration](#configuration)
+* [Contributors](#contributors)
 * [Todo](#todo)
 * [Related projects](#related-projects)
 * [License](#license)
@@ -40,19 +41,53 @@ yay -S polywatch
 ```
 
 # Usage
-Create the config file, run `polywatch` & it runs the command(s) when changes happen
+Create the config file, run `polywatch` & it runs the command(s) on start and then whenever changes happen
 
 # Configuration
 Configuration is done using a single file named `.pw` with these extensions: `json`, `toml`, `yml`, `yaml`, `hcl` & `ini`.
 It have to be located in **current working directory**.
 [Example](pw.example.yml) yaml config file can be a proper starting point.
 
+Configuration consists of multiple independent watchers:
+```yaml
+watchers:
+	- name: "watcher 1"
+	- name: "watcher 2"
+	- name: "watcher 3"
+```
+
+Each watcher have 5 configuration sections:
+## Name Config
+Name is a single string field. It's just a label for the watcher
+```yaml
+name: "watcher name"
+```
+
+## Watch Config
+Watch as it's expected contains files & directories watching settings
+* method: Defines watching mechanism. Currently just supports `polling` method that watches for file changes
+in fixed intervals
+* interval: When method is `polling`, it sets interval between each watch.
+* files: Array of [WatchFile](#watchfile). Matching files get appended together; they get combined by logical OR.
+* filters: Array of [WatchFilter](#watchfilter). Each candidate file have to pass all filters' tests in order to
+make notification.
+
+### WatchFile
+
+### WatchFilter
+
+## RateLimit Config
+## Kill Config
+## Command Config
+
+# Contributors
+Thanks to [Saman Koushki][gh-saman3d] for enabling multiline commands & improving process management.
+
 # Todo
 1. Implement fsnotify watch method
-2. Support multiline commands
-3. Support event filters like filters on operation scope
-4. Consider kill timeout
-5. Add wildcard filter type
+2. Support event filters like filters on operation scope
+3. Consider kill timeout
+4. Add wildcard filter type
 
 # Related projects
 * [fswatch][fswatch]: Command line tool to watch file changes using fsnotify
@@ -70,3 +105,4 @@ This software is [licensed](LICENSE) under the [GPL v3 License][gpl]. © 2023 [J
 [fsnotify]: https://github.com/fsnotify/fsnotify
 [gpl]: https://www.gnu.org/licenses/gpl-3.0.en.html
 [janstun]: http://janstun.com
+[gh-saman3d]: https://github.com/saman3d
