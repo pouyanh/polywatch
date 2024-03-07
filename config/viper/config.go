@@ -153,10 +153,10 @@ func (k Kill) decode() config.Kill {
 }
 
 type Command struct {
-	Shell   string   `mapstructure:"shell"`
-	Env     []string `mapstructure:"env"`
-	Exec string   `mapstructure:"exec"`
-	Path   string   `mapstructure:"path"`
+	Shell string   `mapstructure:"shell"`
+	Env   []string `mapstructure:"env"`
+	Exec  string   `mapstructure:"exec"`
+	Path  string   `mapstructure:"path"`
 }
 
 func (c Command) decode() config.Command {
@@ -181,8 +181,9 @@ func testStringZero(v string) bool {
 	return len(strings.TrimSpace(v)) == 0
 }
 
+//nolint:unused
 func testStringSliceZero(v []string) bool {
-	return v == nil || len(v) == 0
+	return len(v) == 0
 }
 
 func testNil[T any](v *T) bool {

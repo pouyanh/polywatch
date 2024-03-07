@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -74,11 +75,13 @@ func newPolyWatcher(cfg config.Watcher) (*polyWatcher, error) {
 
 	w := watcher.New()
 	for _, wf := range cfg.Watch.Files {
+		path := filepath.Clean(os.ExpandEnv(wf.Path))
+
 		var err error
 		if wf.Recursive {
-			err = w.AddRecursive(wf.Path)
+			err = w.AddRecursive(path)
 		} else {
-			err = w.Add(wf.Path)
+			err = w.Add(path)
 		}
 
 		if err != nil {
